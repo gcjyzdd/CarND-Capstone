@@ -26,7 +26,7 @@ class TLDetector(object):
         self.waypoints_2d = None
         self.has_image = None
         self.lights = []
-
+        self.img_idx = 0
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
@@ -57,7 +57,7 @@ class TLDetector(object):
         self.loop()
 
     def loop(self):
-        rate = rospy.Rate(1)
+        rate = rospy.Rate(2)
         while not rospy.is_shutdown():
             if self.pose and self.waypoints and self.has_image:
                 light_wp, state = self.process_traffic_lights()
@@ -183,6 +183,10 @@ class TLDetector(object):
             y2 = self.waypoints.waypoints[line_wp_idx].pose.pose.position.y
             d = sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
             rospy.loginfo('Dist to tl: {}'.format(d))
+            if d<100:
+                cv2.imwrite('/home/student/host2/CarND-Capstone/images/cam_{}_{}.jpg'.format(self.img_idx, state), self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8"))
+                self.img_idx += 1
+                rospy.loginfo('Recorded {} images.'.format(self.img_idx))
             return line_wp_idx, state
 
         return -1, TrafficLight.UNKNOWN
