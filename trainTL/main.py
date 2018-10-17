@@ -155,7 +155,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
 def run():
     num_classes = 3
     image_shape = (192, 256)
-    data_dir = './data'
+    data_dir = './data_tl'
     runs_dir = './runs'
     # tests.test_for_kitti_dataset(data_dir)
 
@@ -170,7 +170,7 @@ def run():
         # Path to vgg model
         vgg_path = os.path.join(data_dir, 'vgg')
         # Create function to get batches
-        get_batches_fn = helper.gen_batch_function(os.path.join(data_dir, 'data_tl/training'), image_shape)
+        get_batches_fn = helper.gen_batch_function(os.path.join(data_dir, 'training'), image_shape)
 
         # OPTIONAL: Augment Images for better results
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
@@ -233,4 +233,4 @@ def process_video():
 
 if __name__ == '__main__':
     run()
-    process_video()
+    # process_video()
