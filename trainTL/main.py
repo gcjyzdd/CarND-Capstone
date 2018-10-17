@@ -74,7 +74,7 @@ def layers(vgg_layer7_out, keep_prob, n_classes):
     fc0 = flatten(vgg_layer7_out)
 
     # SOLUTION: Layer 3: Fully Connected. Input = 400. Output = 120.
-    fc1_W = tf.Variable(tf.truncated_normal(shape=(520, 100), mean=mu, stddev=sigma))
+    fc1_W = tf.Variable(tf.truncated_normal(shape=(196608, 100), mean=mu, stddev=sigma))
     fc1_b = tf.Variable(tf.zeros(100))
     fc1 = tf.matmul(fc0, fc1_W) + fc1_b
 

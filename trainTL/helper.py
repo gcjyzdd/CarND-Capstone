@@ -107,9 +107,10 @@ def gen_test_output(sess, logits, keep_prob, image_pl, data_folder, image_shape)
         im_softmax = sess.run(
             [tf.argmax(logits, axis = 1)],
             {keep_prob: 1.0, image_pl: [image]})
-        base = os.path.splitext(image_file)[0]
-        ext = os.path.splitext(image_file)[1]
-        yield base+'_classify_'+str(im_softmax)+ext, np.array(image)
+        basename = os.path.basename(image_file)
+        base = os.path.splitext(basename)[0]
+        ext = os.path.splitext(basename)[1]
+        yield base+'_classify_'+str(im_softmax[0])+ext, np.array(image)
 
 def gen_output_per_img(sess, logits, keep_prob, image_pl, img, image_shape):
     """
