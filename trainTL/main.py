@@ -203,6 +203,33 @@ def run():
         # OPTIONAL: Apply the trained model to a video
 
 
+def runTest():
+    num_classes = 3
+    image_shape = (192, 256)
+    data_dir = './data_tl'
+    runs_dir = './runs'
+    with tf.Session() as sess:
+        # Path to vgg model
+        vgg_path = os.path.join(data_dir, 'vgg')
+
+        # OPTIONAL: Augment Images for better results
+        #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
+
+        # TODO: Build NN using load_vgg, layers, and optimize function
+        input_image, keep_prob, layer7_out = load_vgg(sess, vgg_path)
+        logits = layers(layer7_out, keep_prob, num_classes)
+
+        y = tf.placeholder(tf.int32, (None))
+        correct_label = tf.one_hot(y, num_classes)
+
+        learning_rate = tf.placeholder(tf.float32)
+
+        logits, train_op, cross_entropy_loss = optimize(logits, correct_label, learning_rate, num_classes)
+
+        saver = tf.train.Saver()
+        saver.restore(sess, tf.train.latest_checkpoint('./'))
+        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
+
 def process_video():
     num_classes = 2
     image_shape = (160, 576)
