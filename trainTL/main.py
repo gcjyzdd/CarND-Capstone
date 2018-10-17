@@ -259,5 +259,6 @@ def process_video():
 
 
 if __name__ == '__main__':
-    run()
+    #run()
+    runTest()
     # process_video()
