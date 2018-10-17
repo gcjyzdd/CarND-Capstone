@@ -7,3 +7,8 @@ profile.tmp
 ros/venv
 ros/src/.idea
 ros/.idea
+data_tl
+images
+*.idea*
+*.p
+*.zip
