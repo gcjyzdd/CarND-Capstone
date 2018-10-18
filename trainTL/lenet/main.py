@@ -36,6 +36,9 @@ def layers(x, keep_prob, n_classes):
     mu = 0
     sigma = 0.1
 
+    # normalize data
+    x = tf.subtract(tf.div(x, 255.), 0.5)
+
     # SOLUTION: Layer 1: Convolutional. Input = 72x96x3. Output = 28x28x6.
     conv1_W = tf.Variable(tf.truncated_normal(shape=(3, 3, 3, 5), mean=mu, stddev=sigma))
     conv1_b = tf.Variable(tf.zeros(5))
