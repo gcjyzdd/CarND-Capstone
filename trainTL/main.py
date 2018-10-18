@@ -118,10 +118,14 @@ def optimize(logits, correct_label, learning_rate, num_classes):
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
     train_op = optimizer.minimize(loss_operation)
 
-    return logits, train_op, loss_operation  # cross_entropy_loss
+    # validation
+    correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(correct_label, 1))
+    accuracy_operation = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+    return logits, train_op, loss_operation, accuracy_operation  # cross_entropy_loss
 
 
-def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
+def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, acc_op, input_image,
              y, keep_prob, learning_rate):
     """
     Train neural network and print out the loss during training.
@@ -147,9 +151,9 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
             i += 1
             sess.run(train_op,
                      feed_dict={input_image: image, y: label, keep_prob: 0.5, learning_rate: 1e-3})
-            loss += sess.run(cross_entropy_loss,
+            loss += sess.run(acc_op,
                              feed_dict={input_image: image, y: label, keep_prob: 0.5, learning_rate: 1e-3})
-        print("\nloss =  {} ".format(loss))
+        print("\nAvg loss =  {} ".format(loss/i))
 
 
 def run():
@@ -187,11 +191,11 @@ def run():
 
         learning_rate = tf.placeholder(tf.float32)
 
-        logits, train_op, cross_entropy_loss = optimize(logits, correct_label, learning_rate, num_classes)
+        logits, train_op, cross_entropy_loss, acc_op = optimize(logits, correct_label, learning_rate, num_classes)
 
         # TODO: Train NN using the train_nn function
         sess.run(tf.global_variables_initializer())
-        train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input_image, y,
+        train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, acc_op, input_image, y,
                  keep_prob, learning_rate)
 
         saver = tf.train.Saver()
