@@ -73,7 +73,7 @@ def layers(x, keep_prob, n_classes):
     fc1 = tf.nn.dropout(fc1, keep_prob)
 
     # SOLUTION: Layer 4: Fully Connected. Input = 120. Output = 84.
-    fc2_W = tf.Variable(tf.truncated_normal(shape=(160, 84), mean=mu, stddev=sigma))
+    fc2_W = tf.Variable(tf.truncated_normal(shape=(120, 84), mean=mu, stddev=sigma))
     fc2_b = tf.Variable(tf.zeros(84))
     fc2 = tf.matmul(fc1, fc2_W) + fc2_b
 
