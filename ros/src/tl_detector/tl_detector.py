@@ -57,11 +57,11 @@ class TLDetector(object):
         self.loop()
 
     def loop(self):
-        rate = rospy.Rate(2)
+        rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             if self.pose and self.waypoints and self.has_image:
                 light_wp, state = self.process_traffic_lights()
-
+                # rospy.loginfo('light_wp = {}, state = {}'.format(light_wp, state))
                 '''
                 Publish upcoming red lights at fixed frequency.
                 Each predicted state has to occur `STATE_COUNT_THRESHOLD` number
