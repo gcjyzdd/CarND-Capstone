@@ -112,6 +112,32 @@ def gen_test_output(sess, logits, keep_prob, image_pl, data_folder, image_shape)
         ext = os.path.splitext(basename)[1]
         yield base+'_classify_'+str(im_softmax[0])+ext, np.array(image)
 
+def gen_output_per_img(sess, logits, keep_prob, image_pl, img, image_shape):
+    """
+    Generate test output using the test images
+    :param sess: TF session
+    :param logits: TF Tensor for the logits
+    :param keep_prob: TF Placeholder for the dropout keep robability
+    :param image_pl: TF Placeholder for the image placeholder
+    :param data_folder: Path to the folder that contains the datasets
+    :param image_shape: Tuple - Shape of image
+    :return: Output for for each test image
+    """
+
+    image = scipy.misc.imresize(img, image_shape)
+
+    im_softmax = sess.run(
+        [tf.nn.softmax(logits)],
+        {keep_prob: 1.0, image_pl: [image]})
+    im_softmax = im_softmax[0][:, 1].reshape(image_shape[0], image_shape[1])
+    segmentation = (im_softmax > 0.5).reshape(image_shape[0], image_shape[1], 1)
+    mask = np.dot(segmentation, np.array([[0, 255, 0, 127]]))
+    mask = scipy.misc.toimage(mask, mode="RGBA")
+    street_im = scipy.misc.toimage(image)
+    street_im.paste(mask, box=None, mask=mask)
+
+    return np.array(street_im)
+
 
 def save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image):
     # Make folder for current run
