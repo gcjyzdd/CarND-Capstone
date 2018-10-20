@@ -132,17 +132,17 @@ class TLDetector(object):
 
         """
         # For testing, just return the light state
-        rospy.loginfo('light.state = {}'.format(light.state))
-        return light.state
+        #rospy.loginfo('light.state = {}'.format(light.state))
+        #return light.state
 
-        #if (not self.has_image):
-        #    self.prev_light_loc = None
-        #    return False
+        if (not self.has_image):
+            self.prev_light_loc = None
+            return False
 
-        #cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
 
         # Get classification
-        #return self.light_classifier.get_classification(cv_image)
+        return self.light_classifier.get_classification(cv_image)
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
@@ -176,7 +176,6 @@ class TLDetector(object):
                     closest_light = light
                     line_wp_idx = temp_wp_idx
         if closest_light:
-            state = self.get_light_state(closest_light)
             x1 = self.pose.pose.position.x
             y1 = self.pose.pose.position.y
             x2 = self.waypoints.waypoints[line_wp_idx].pose.pose.position.x
@@ -184,10 +183,12 @@ class TLDetector(object):
             d = sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
             rospy.loginfo('Dist to tl: {}'.format(d))
             if d<100:
-                cv2.imwrite('/home/student/host2/CarND-Capstone/images/cam_{}_{}.jpg'.format(self.img_idx, state), self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8"))
-                self.img_idx += 1
-                rospy.loginfo('Recorded {} images.'.format(self.img_idx))
-            return line_wp_idx, state
+                # cv2.imwrite('/home/student/host2/CarND-Capstone/images/cam_{}_{}.jpg'.format(self.img_idx, state), self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8"))
+                # self.img_idx += 1
+                # rospy.loginfo('Recorded {} images.'.format(self.img_idx))
+                state = self.get_light_state(closest_light)
+                rospy.loginfo('light state = {}'.format(state))
+                return line_wp_idx, state
 
         return -1, TrafficLight.UNKNOWN
 
