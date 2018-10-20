@@ -75,37 +75,20 @@ def layers(x, keep_prob, n_classes):
     return logits
 
 
-def optimize(logits, correct_label, learning_rate, num_classes):
-    """
-    Build the TensorFLow loss and optimizer operations.
-    :param nn_last_layer: TF Tensor of the last layer in the neural network
-    :param correct_label: TF Placeholder for the correct label image
-    :param learning_rate: TF Placeholder for the learning rate
-    :param num_classes: Number of classes to classify
-    :return: Tuple of (logits, train_op, cross_entropy_loss)
-    """
-    # TODO: Implement function
-    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=correct_label, logits=logits)
-    loss_operation = tf.reduce_mean(cross_entropy)
-    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
-    train_op = optimizer.minimize(loss_operation)
-
-    # validation
-    correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(correct_label, 1))
-    accuracy_operation = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-
-    return logits, train_op, loss_operation, accuracy_operation  # cross_entropy_loss
-
-
 class TLClassifier(object):
-    def __init__(self):
+    def __init__(self, is_site):
         # TODO load classifier
-        num_classes = 3
+
+        if is_site:
+            num_classes = 4
+        else:
+            num_classes = 3
+
         image_shape = (192, 256)
         self.image_shape = image_shape
         sess = tf.Session()
 
-        #with tf.Session() as sess:
+        # with tf.Session() as sess:
         x = tf.placeholder(tf.float32, (None, image_shape[0], image_shape[1], 3))
         keep_prob = tf.placeholder(tf.float32)  # probability to keep units
         logits = layers(x, keep_prob, num_classes)
@@ -115,7 +98,11 @@ class TLClassifier(object):
         self.keep_prob = keep_prob
 
         saver = tf.train.Saver()
-        saver.restore(sess, tf.train.latest_checkpoint('./lenet_model/'))
+
+        if is_site:
+            saver.restore(sess, tf.train.latest_checkpoint('./lenet_model_site/'))
+        else:
+            saver.restore(sess, tf.train.latest_checkpoint('./lenet_model/'))
 
         self.sess = sess
 
@@ -131,7 +118,7 @@ class TLClassifier(object):
         """
         # TODO implement light color prediction
         image = scipy.misc.imresize(image, self.image_shape)
-        #with tf.Session() as sess:
+        # with tf.Session() as sess:
         im_softmax = self.sess.run(
             [tf.argmax(self.logits, axis=1)],
             {self.keep_prob: 1.0, self.x: [image]})
@@ -141,6 +128,8 @@ class TLClassifier(object):
         elif s == 1:
             return TrafficLight.YELLOW
         elif s == 2:
+            return TrafficLight.GREEN
+        elif s == 3:  # No traffic lights detected, return green to move on
             return TrafficLight.GREEN
         else:
             return TrafficLight.UNKNOWN
